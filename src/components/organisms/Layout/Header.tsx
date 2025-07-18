@@ -23,7 +23,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({collapsed, toggle}) => (
             className: 'trigger',
             onClick: toggle,
         })}
-        {/*<span style={{marginLeft: 16, fontSize: 18}}>Парус</span>*/}
         <Menu
             mode="horizontal"
             selectable={false}

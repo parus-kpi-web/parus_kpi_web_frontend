@@ -1,18 +1,18 @@
 import React from 'react';
-import { Layout } from '../../components';
-import SplitPaneLayout from '../organisms/SplitPane/SplitPaneLayout';
-import Table from '../organisms/Table';
+import { Layout, MultiSplitPane, Table } from '../../components';
 
 const DashboardTemplate: React.FC = () => {
     const [collapsed, setCollapsed] = React.useState(false);
 
     return (
         <Layout collapsed={collapsed} toggle={() => setCollapsed((c) => !c)}>
-            <SplitPaneLayout
-                orientation="vertical"
-                left={<Table data={[]} columns={[]}/>}
-                right={<Table data={[]} columns={[]}/>}
-            />
+            <MultiSplitPane orientation="horizontal" defaultSizes={[10,20,30,20,20]}>
+                <Table data={[]} columns={[]} />
+                <Table  data={[]} columns={[]}/>
+                <Table  data={[]} columns={[]}/>
+                <Table  data={[]} columns={[]}/>
+                <Table  data={[]} columns={[]}/>
+            </MultiSplitPane>
         </Layout>
     );
 };
