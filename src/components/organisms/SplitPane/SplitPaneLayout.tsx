@@ -11,7 +11,7 @@ export interface SplitPaneLayoutProps {
 const SplitPaneLayout: React.FC<SplitPaneLayoutProps> = ({
                                                              left,
                                                              right,
-                                                             orientation = 'vertical',
+                                                             orientation = 'horizontal',
                                                          }) => (
     <ReflexContainer orientation={orientation}>
         <ReflexElement>{left}</ReflexElement>

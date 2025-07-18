@@ -7,7 +7,7 @@ const DashboardTemplate: React.FC = () => {
     return (
         <Layout collapsed={collapsed} toggle={() => setCollapsed((c) => !c)}>
             <SplitPaneLayout
-                orientation="vertical"
+                orientation="horizontal"
                 left={<Table data={[]} columns={[]}/>}
                 right={<Table data={[]} columns={[]}/>}
             />
