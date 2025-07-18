@@ -12,7 +12,7 @@
 export { default as Layout } from './organisms/Layout/Layout';
 export { default as Header } from './organisms/Layout/Header';
 export { default as SidebarMenu } from './organisms/SidebarMenu/SidebarMenu';
-export { default as MultiSplitPane } from './organisms/SplitPane/MultiSplitPane.tsx';
+export { default as SplitPaneLayout } from './organisms/SplitPane/SplitPaneLayout';
 export { default as Table } from './organisms/Table';
 
 // TEMPLATES
