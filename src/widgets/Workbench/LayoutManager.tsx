@@ -1,17 +1,23 @@
 import 'rc-dock/dist/rc-dock.css';
-import DockLayout, {type LayoutBase, type PanelData, type TabData } from 'rc-dock';
+import DockLayout, { type LayoutBase, type PanelData, type TabData } from 'rc-dock';
 import { useEffect, useRef, useState } from 'react';
 import { loadJSON, saveJSON } from '../../shared/lib/storage';
 import { createPanelTab } from './PanelManager';
 
-const STORAGE_KEY = 'workbench.layout.v1';
+// измени ключ, чтобы не подхватывалась старая раскладка
+const STORAGE_KEY = 'workbench.layout.v2';
 
+// ОДНА панель со вкладками (внутри tabs: [...]) вместо двух колонок
 const defaultLayout: LayoutBase = {
     dockbox: {
         mode: 'horizontal',
         children: [
-            { size: 0.35, tabs: [createPanelTab('table.employees', { title: 'Сотрудники' })] },
-            { size: 0.65, tabs: [createPanelTab('table.services', { title: 'Услуги' })] },
+            {
+                tabs: [
+                    createPanelTab('table.employees', { title: 'Сотрудники' }),
+                    createPanelTab('table.services', { title: 'Услуги' }),
+                ],
+            },
         ],
     },
 };
@@ -25,7 +31,7 @@ export function LayoutManager() {
         saveJSON(STORAGE_KEY, l);
     };
 
-    // простейшее API открытия панели глобально (можно заменить на контекст)
+    // простое API для открытия панели
     useEffect(() => {
         (window as any).openPanel = (type: string, params?: any) => {
             const tab: TabData = createPanelTab(type as any, params);

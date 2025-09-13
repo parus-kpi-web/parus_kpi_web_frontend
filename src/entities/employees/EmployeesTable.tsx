@@ -1,17 +1,17 @@
 import { DataGrid } from '../../shared/ui/organisms/DataGrid/DataGrid';
 import type { GridColumn } from '../../shared/ui/organisms/DataGrid/types';
-import type { ListResponse } from '../../shared/lib/types';
+import type { ListRequest, ListResponse } from '../../shared/lib/types';
 
 export type Employee = {
     fio: string;
     lastName: string;
     firstName: string;
     middleName?: string;
-    staffType: string;      // Тип персонала
-    position: string;       // Штатная должность
-    unitName: string;       // Наименование подразделения
-    unitCode: string;       // Код подразделения
-    employmentType?: string;// Тип исполнения
+    staffType: string;
+    position: string;
+    unitName: string;
+    unitCode: string;
+    employmentType?: string;
 };
 
 const columns: GridColumn<Employee>[] = [
@@ -22,7 +22,7 @@ const columns: GridColumn<Employee>[] = [
     { field: 'employmentType', headerName: 'Тип исполнения', width: 180 },
 ];
 
-async function mockDataSource(): Promise<ListResponse<Employee>> {
+async function mockDataSource(_: ListRequest): Promise<ListResponse<Employee>> {
     const items: Employee[] = Array.from({ length: 60 }).map((_, i) => ({
         fio: 'Анисимов Арсентий Валерьевич',
         lastName: 'Анисимов',
@@ -39,11 +39,11 @@ async function mockDataSource(): Promise<ListResponse<Employee>> {
 
 export function EmployeesTable({ storageKey = 'panel.employees' }: { storageKey?: string }) {
     return (
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ padding: 8, borderBottom: '1px solid var(--border)' }}>
                 <strong>Сотрудники</strong>
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minHeight: 0 }}>
                 <DataGrid<Employee> storageKey={storageKey} columns={columns} dataSource={mockDataSource} />
             </div>
         </div>

@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
+// гарантированно подключаем стили темы
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+
 import type { GridColumn, ServerDataSource } from './types';
 import type { ListRequest } from '../../../lib/types';
 import { loadJSON, saveJSON } from '../../../lib/storage';
@@ -56,9 +60,8 @@ export function DataGrid<T extends object>({
     }, [page, pageSize, JSON.stringify(filters)]);
 
     return (
-        <div className="ag-theme-alpine" style={{height: '100%', width: '100%', minHeight: 0}}>
-            {/* TODO: вынести FilterBar и пагинацию (UI) */}
-            <AgGridReact rowData={rows} columnDefs={colDefs as any} suppressCellFocus={true}/>
+        <div className="ag-theme-alpine" style={{ height: '100%', width: '100%', minHeight: 0 }}>
+            <AgGridReact rowData={rows} columnDefs={colDefs as any} suppressCellFocus={true} />
         </div>
     );
 }
