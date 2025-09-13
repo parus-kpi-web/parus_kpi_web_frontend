@@ -1,4 +1,4 @@
-import type { ListRequest, ListResponse } from '@/shared/lib/types';
+import type { ListRequest, ListResponse } from '../../../lib/types';
 
 export type GridColumn<T> = {
     field: keyof T | string;
