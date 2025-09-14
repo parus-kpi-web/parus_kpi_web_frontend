@@ -1,63 +1,29 @@
-/* Подключаем дизайн-токены */
 @import './tokens.css';
 
-/* База: растянуть приложение и убрать отступы браузера */
-html, body, #root {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
+/* База */
+html, body, #root { height: 100%; margin: 0; padding: 0; }
 *, *::before, *::after { box-sizing: border-box; }
 
 .app-shell {
-    /* Было 100% — не работало без высоты корня.
-       Делаем на весь экран, чтобы rc-dock и ag-grid получили реальную высоту */
-    height: 100vh;        /* можно заменить на 100dvh при желании */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     background: var(--color-bg, #fff);
     color: var(--color-fg, #0f172a);
 }
-
 .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 48px;
-    padding: 0 12px;
-    border-bottom: 1px solid var(--border);
-    background: #f8fafc;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 48px; padding: 0 12px; border-bottom: 1px solid var(--border); background: #f8fafc;
 }
 .app-header__title { font-weight: 600; }
+.top-strip { height: 40px; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--border); background: #fff; }
 
-.top-strip {
-    height: 40px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    border-bottom: 1px solid var(--border);
-    background: #fff;
-}
+/* Рабочая область под dock */
+.workbench-area { flex: 1; min-height: 0; position: relative; }
 
-/* очень важно для вложенных абсолютных/флекс-children (rc-dock) */
-.workbench-area {
-    flex: 1;
-    min-height: 0;
-    position: relative;
-}
+/* ВАЖНО: никаких абсолютов на внутренних классах rc-dock!
+   Оставляем лишь «растяжение» контента вкладки. */
+.dock-panel { min-height: 0; }
+.dock-panel .dock-content { display: flex; flex-direction: column; min-height: 0; }
 
-/* === rc-dock: растягиваем контент вкладок === */
-.dock-panel .dock-content,
-.dock-tabpane,
-.dock-tabpane .dock-tabpane-content {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    flex: 1 1 auto;
-}
-
-/* === rc-dock: растягиваем контент вкладок === */
-.dock-panel { display:flex; flex-direction:column; min-height:0; }
-.dock-panel .dock-panels { position:relative; flex:1 1 auto; min-height:0; }
-.dock-panel .dock-tabpane { position:absolute; inset:0; display:flex; flex-direction:column; min-height:0; }
-.dock-panel .dock-tabpane .dock-content { flex:1 1 auto; min-height:0; position:relative; }
+/* ag-grid контейнеры будут занимать всю доступную высоту за счёт flex в компонентах */

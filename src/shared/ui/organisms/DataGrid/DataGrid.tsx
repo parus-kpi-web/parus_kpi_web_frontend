@@ -24,7 +24,7 @@ export function DataGrid<T extends object>({
                                            }: DataGridProps<T>) {
     const [rows, setRows] = useState<T[]>([]);
     const [total, setTotal] = useState(0);
-    const [page, setPage] = useState(1);
+    const [page] = useState(1);
     const [filters, setFilters] = useState<Record<string, unknown>>(
         () => loadJSON(storageKey + ':filters', defaultFilters ?? {})
     );
@@ -36,9 +36,7 @@ export function DataGrid<T extends object>({
                 headerName: c.headerName,
                 width: c.width,
                 editable: c.editable,
-                valueFormatter: c.valueFormatter
-                    ? (p: any) => c.valueFormatter?.(p.value, p.data)
-                    : undefined,
+                valueFormatter: c.valueFormatter ? (p: any) => c.valueFormatter?.(p.value, p.data) : undefined,
             })),
         [columns]
     );
@@ -56,11 +54,12 @@ export function DataGrid<T extends object>({
 
     useEffect(() => {
         load();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, pageSize, JSON.stringify(filters)]);
 
     return (
         <div className="ag-theme-alpine" style={{ height: '100%', width: '100%', minHeight: 0 }}>
-            <AgGridReact rowData={rows} columnDefs={colDefs as any} suppressCellFocus={true} />
+            <AgGridReact rowData={rows} columnDefs={colDefs as any} suppressCellFocus />
         </div>
     );
 }

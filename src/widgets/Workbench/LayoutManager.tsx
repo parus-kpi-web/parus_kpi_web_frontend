@@ -24,18 +24,14 @@ export function LayoutManager() {
     const layoutRef = useRef<DockLayout>(null);
     const [layout, setLayout] = useState<LayoutBase>(() => loadJSON(STORAGE_KEY, defaultLayout));
 
-    const onLayoutChange = (l: LayoutBase) => {
-        setLayout(l);
-        saveJSON(STORAGE_KEY, l);
-    };
+    const onLayoutChange = (l: LayoutBase) => { setLayout(l); saveJSON(STORAGE_KEY, l); };
 
-    // Восстановление content после перезагрузки/рестарта
+    // Восстанавливаем content для табов из сохранённых метаданных
     function loadTab(tab: TabData): TabData {
         const type: PanelType | undefined =
             (tab.data as any)?.type ?? (tab.id?.split(':')[0] as PanelType | undefined);
         const params: PanelParams | undefined = (tab.data as any)?.params;
-        if (!type) return tab; // на всякий случай
-        return { ...tab, content: resolvePanel(type, params) };
+        return type ? { ...tab, content: resolvePanel(type, params), data: { type, params } } : tab;
     }
 
     useEffect(() => {
@@ -50,7 +46,7 @@ export function LayoutManager() {
             ref={layoutRef}
             defaultLayout={layout}
             onLayoutChange={onLayoutChange}
-            style={{ position: 'absolute', inset: 0 }}
+            style={{ height: '100%', width: '100%' }}   // достаточно растянуть контейнер
             loadTab={loadTab}
             loadPanel={(p: PanelData) => p}
         />

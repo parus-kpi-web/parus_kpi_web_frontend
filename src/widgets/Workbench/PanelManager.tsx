@@ -2,6 +2,9 @@ import type { TabData } from 'rc-dock';
 import React from 'react';
 import { ServicesTable } from '../../entities/services/ServicesTable';
 import { EmployeesTable } from '../../entities/employees/EmployeesTable';
+import { StockTable } from '../../entities/stock/StockTable';
+import { CasesTable } from '../../entities/cases/CasesTable';
+import { FinanceTable } from '../../entities/finance/FinanceTable';
 
 export type PanelType =
     | 'table.services'
@@ -20,9 +23,9 @@ export type PanelParams = {
 const registry: Record<PanelType, (p?: PanelParams) => React.ReactNode> = {
     'table.services': (p) => <ServicesTable storageKey={p?.storageKey ?? 'panel.services'} />,
     'table.employees': (p) => <EmployeesTable storageKey={p?.storageKey ?? 'panel.employees'} />,
-    'table.stock': () => <div style={{ padding: 12 }}>StockTable: добавим позже</div>,
-    'table.cases': () => <div style={{ padding: 12 }}>CasesTable: добавим позже</div>,
-    'table.finance': () => <div style={{ padding: 12 }}>FinanceTable: добавим позже</div>,
+    'table.stock': (p) => <StockTable storageKey={p?.storageKey ?? 'panel.stock'} />,
+    'table.cases': (p) => <CasesTable storageKey={p?.storageKey ?? 'panel.cases'} />,
+    'table.finance': (p) => <FinanceTable storageKey={p?.storageKey ?? 'panel.finance'} />,
 };
 
 const defaultTitles: Record<PanelType, string> = {
@@ -44,7 +47,6 @@ export function createPanelTab(type: PanelType, params?: PanelParams): TabData {
         content: resolvePanel(type, params),
         cached: true,
         closable: true,
-        // ВАЖНО: сохраняем метаданные для восстановления
         data: { type, params },
     } as TabData;
 }

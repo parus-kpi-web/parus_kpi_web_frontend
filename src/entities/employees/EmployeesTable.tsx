@@ -39,7 +39,7 @@ async function mockDataSource(_: ListRequest): Promise<ListResponse<Employee>> {
 
 export function EmployeesTable({ storageKey = 'panel.employees' }: { storageKey?: string }) {
     return (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ padding: 8, borderBottom: '1px solid var(--border)' }}>
                 <strong>Сотрудники</strong>
             </div>

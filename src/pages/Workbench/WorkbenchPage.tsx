@@ -5,7 +5,6 @@ export function WorkbenchPage() {
         <div className="app-shell">
             <header className="app-header">
                 <div className="app-header__title">Записи в журнале</div>
-                {/* справа можно добавить кнопки/профиль */}
             </header>
 
             <div className="top-strip">KPI</div>
