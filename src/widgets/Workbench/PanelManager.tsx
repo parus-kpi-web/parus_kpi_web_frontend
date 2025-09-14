@@ -25,12 +25,26 @@ const registry: Record<PanelType, (p?: PanelParams) => React.ReactNode> = {
     'table.finance': () => <div style={{ padding: 12 }}>FinanceTable: добавим позже</div>,
 };
 
+const defaultTitles: Record<PanelType, string> = {
+    'table.services': 'Услуги',
+    'table.employees': 'Сотрудники',
+    'table.stock': 'Склад',
+    'table.cases': 'Госпитализации',
+    'table.finance': 'Финансы',
+};
+
+export function resolvePanel(type: PanelType, params?: PanelParams) {
+    return registry[type](params);
+}
+
 export function createPanelTab(type: PanelType, params?: PanelParams): TabData {
     return {
         id: `${type}:${params?.title ?? ''}:${crypto.randomUUID()}`,
-        title: params?.title ?? type,
-        content: registry[type](params),
+        title: params?.title ?? defaultTitles[type],
+        content: resolvePanel(type, params),
         cached: true,
         closable: true,
+        // ВАЖНО: сохраняем метаданные для восстановления
+        data: { type, params },
     } as TabData;
 }

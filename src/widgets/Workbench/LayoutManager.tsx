@@ -2,12 +2,10 @@ import 'rc-dock/dist/rc-dock.css';
 import DockLayout, { type LayoutBase, type PanelData, type TabData } from 'rc-dock';
 import { useEffect, useRef, useState } from 'react';
 import { loadJSON, saveJSON } from '../../shared/lib/storage';
-import { createPanelTab } from './PanelManager';
+import { createPanelTab, resolvePanel, type PanelType, type PanelParams } from './PanelManager';
 
-// измени ключ, чтобы не подхватывалась старая раскладка
-const STORAGE_KEY = 'workbench.layout.v2';
+const STORAGE_KEY = 'workbench.layout.v1';
 
-// ОДНА панель со вкладками (внутри tabs: [...]) вместо двух колонок
 const defaultLayout: LayoutBase = {
     dockbox: {
         mode: 'horizontal',
@@ -31,10 +29,18 @@ export function LayoutManager() {
         saveJSON(STORAGE_KEY, l);
     };
 
-    // простое API для открытия панели
+    // Восстановление content после перезагрузки/рестарта
+    function loadTab(tab: TabData): TabData {
+        const type: PanelType | undefined =
+            (tab.data as any)?.type ?? (tab.id?.split(':')[0] as PanelType | undefined);
+        const params: PanelParams | undefined = (tab.data as any)?.params;
+        if (!type) return tab; // на всякий случай
+        return { ...tab, content: resolvePanel(type, params) };
+    }
+
     useEffect(() => {
-        (window as any).openPanel = (type: string, params?: any) => {
-            const tab: TabData = createPanelTab(type as any, params);
+        (window as any).openPanel = (type: PanelType, params?: PanelParams) => {
+            const tab = createPanelTab(type, params);
             layoutRef.current?.dockMove(tab, null, 'middle');
         };
     }, []);
@@ -45,7 +51,7 @@ export function LayoutManager() {
             defaultLayout={layout}
             onLayoutChange={onLayoutChange}
             style={{ position: 'absolute', inset: 0 }}
-            loadTab={(t) => t}
+            loadTab={loadTab}
             loadPanel={(p: PanelData) => p}
         />
     );

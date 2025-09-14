@@ -55,3 +55,9 @@ html, body, #root {
     min-height: 0;
     flex: 1 1 auto;
 }
+
+/* === rc-dock: растягиваем контент вкладок === */
+.dock-panel { display:flex; flex-direction:column; min-height:0; }
+.dock-panel .dock-panels { position:relative; flex:1 1 auto; min-height:0; }
+.dock-panel .dock-tabpane { position:absolute; inset:0; display:flex; flex-direction:column; min-height:0; }
+.dock-panel .dock-tabpane .dock-content { flex:1 1 auto; min-height:0; position:relative; }
