@@ -11,7 +11,7 @@ import { CardsMainTable, CardsSummaryRow } from '../../entities/cards/CardsTable
 import { ServicesMainTable, ServicesSummaryRow } from '../../entities/services/ServicesTables';
 import { MaterialsMainTable, MaterialsSummaryRow } from '../../entities/materials/MaterialsTables';
 
-/** Типы верхних панелей и нижних табов */
+/** Типы наших контентных панелей */
 export type PanelType =
     | 'group.kpi'
     | 'group.ksg'

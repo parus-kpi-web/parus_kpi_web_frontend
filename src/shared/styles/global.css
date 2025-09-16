@@ -20,7 +20,6 @@ html, body, #root { height: 100%; margin: 0; padding: 0; }
 }
 .app-header__title { font-weight:600; }
 
-/* Область рабочего стола (под rc-dock) */
 .workbench-area { flex: 1; min-height: 0; position: relative; }
 .workbench-frame { position: absolute; inset: 0; }
 
@@ -34,12 +33,24 @@ html, body, #root { height: 100%; margin: 0; padding: 0; }
     font-weight: 600;
 }
 
-/* rc-dock: растягиваем контент, не перекрываем таб-бар */
+/* rc-dock: базовая раскладка */
 .dock-panel { display:flex; flex-direction:column; min-height:0; }
 .dock-panel .dock-bar { flex:0 0 auto; }
 .dock-panel .dock-panels { position:relative; flex:1 1 auto; min-height:0; }
 .dock-panel .dock-tabpane { position:absolute; inset:0; display:flex; flex-direction:column; min-height:0; }
 .dock-panel .dock-tabpane .dock-content { flex:1 1 auto; min-height:0; position:relative; }
 
-/* AG Grid: утилиты */
+/* СКРЫТИЕ заголовка панели БЕЗ поломки размеров:
+   если активная вкладка без текста — схлопываем бар и прячем табы */
+.dock-panel:has(.dock-tab-active .dock-tab-text:empty) .dock-bar {
+    height: 6px;
+    padding: 0;
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+}
+.dock-panel:has(.dock-tab-active .dock-tab-text:empty) .dock-tab {
+    display: none;
+}
+
+/* AG Grid утилиты */
 .ag-theme-alpine.no-header .ag-header { display: none; }

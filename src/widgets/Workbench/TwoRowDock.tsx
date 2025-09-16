@@ -2,18 +2,17 @@ import DockLayout, { type LayoutBase } from 'rc-dock';
 import 'rc-dock/dist/rc-dock.css';
 import { ReactNode } from 'react';
 
+/** Внутренний док на две вертикальные панели: основная + сводная */
 export function TwoRowDock({ main, summary }: { main: ReactNode; summary: ReactNode }) {
     const layout: LayoutBase = {
         dockbox: {
             mode: 'vertical',
             children: [
                 {
-                    // основная таблица
                     size: 3,
                     tabs: [{ id: 'main', title: '', content: <div style={{height:'100%'}}>{main}</div>, closable: false }],
                 },
                 {
-                    // сводная строка
                     size: 0.9,
                     tabs: [{ id: 'summary', title: '', content: <div style={{height:'100%'}}>{summary}</div>, closable: false }],
                 },
