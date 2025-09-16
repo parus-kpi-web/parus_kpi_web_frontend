@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 
-/** Регистрация модулей AG Grid v34 (Community) — один раз на бандл */
+/** AG Grid v33+/v34: подключаем Community-модули */
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-/** Стили темы и базовые стили грида */
+/** Используем legacy CSS-темы */
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 
@@ -15,10 +15,14 @@ import { loadJSON, saveJSON } from '../../../lib/storage';
 
 export type DataGridProps<T> = {
     storageKey: string;
-    columns: GridColumn<T>[];             // columns[i].editable? — опционально
-    dataSource: ServerDataSource<T>;      // async (q) => { items, total }
+    columns: GridColumn<T>[];
+    dataSource: ServerDataSource<T>;
     pageSize?: number;
     defaultFilters?: Record<string, unknown>;
+    className?: string;
+    hideHeader?: boolean;
+    rowHeight?: number;
+    headerHeight?: number;
 };
 
 export function DataGrid<T extends object>({
@@ -27,6 +31,10 @@ export function DataGrid<T extends object>({
                                                dataSource,
                                                pageSize = 25,
                                                defaultFilters,
+                                               className,
+                                               hideHeader,
+                                               rowHeight = 28,
+                                               headerHeight = 32,
                                            }: DataGridProps<T>) {
     const [rows, setRows] = useState<T[]>([]);
     const [total, setTotal] = useState(0);
@@ -35,28 +43,20 @@ export function DataGrid<T extends object>({
         () => loadJSON(storageKey + ':filters', defaultFilters ?? {})
     );
 
-    // маппинг наших колонок в колдефы AG Grid
     const colDefs = useMemo(
         () =>
             columns.map((c) => ({
                 field: String(c.field),
                 headerName: c.headerName,
                 width: c.width,
-                // по умолчанию редактируемо; можно выключить на колонке
                 editable: c.editable ?? true,
                 valueFormatter: c.valueFormatter ? (p: any) => c.valueFormatter?.(p.value, p.data) : undefined,
-                // если колонка передала кастомный парсер — пробрасываем (чтобы числа не становились строками)
-                // типы оставляем либеральными, чтобы не ломать проект
-                valueParser: (c as any).valueParser
-                    ? (p: any) => (c as any).valueParser(p.newValue, p.data)
-                    : undefined,
+                valueParser: (c as any).valueParser ? (p: any) => (c as any).valueParser(p.newValue, p.data) : undefined,
             })),
         [columns]
     );
 
-    useEffect(() => {
-        saveJSON(storageKey + ':filters', filters);
-    }, [filters, storageKey]);
+    useEffect(() => { saveJSON(storageKey + ':filters', filters); }, [filters, storageKey]);
 
     async function load() {
         const q: ListRequest = { page, pageSize, filters };
@@ -65,21 +65,22 @@ export function DataGrid<T extends object>({
         setTotal(res.total);
     }
 
-    useEffect(() => {
-        load();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, pageSize, JSON.stringify(filters), dataSource]);
+    useEffect(() => { load(); /* eslint-disable-next-line */ }, [page, pageSize, JSON.stringify(filters), dataSource]);
 
     return (
-        <div className="ag-theme-alpine" style={{ height: '100%', width: '100%', minHeight: 0 }}>
+        <div
+            className={`ag-theme-alpine ${className ?? ''} ${hideHeader ? 'no-header' : ''}`.trim()}
+            style={{ height: '100%', width: '100%', minHeight: 0 }}
+        >
             <AgGridReact
+                theme="legacy"
                 rowData={rows}
                 columnDefs={colDefs as any}
                 defaultColDef={{ resizable: true }}
-                // КРИТИЧЕСКОЕ: не ставим suppressCellFocus — иначе нельзя редактировать
-                stopEditingWhenCellsLoseFocus={true}
+                rowHeight={rowHeight}
+                headerHeight={hideHeader ? 0 : headerHeight}
+                stopEditingWhenCellsLoseFocus
                 onCellValueChanged={(e) => {
-                    // фиксируем изменения в React-состоянии (копия массива с отредактированной строкой)
                     setRows((prev) => {
                         const next = [...prev];
                         const idx = next.indexOf(e.data);

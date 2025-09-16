@@ -11,19 +11,35 @@ html, body, #root { height: 100%; margin: 0; padding: 0; }
     background: var(--color-bg, #fff);
     color: var(--color-fg, #0f172a);
 }
+
 .app-header {
-    display: flex; align-items: center; justify-content: space-between;
-    height: 48px; padding: 0 12px; border-bottom: 1px solid var(--border); background: #f8fafc;
+    display:flex; align-items:center; justify-content:space-between;
+    height:48px; padding:0 12px;
+    border-bottom:1px solid var(--border);
+    background:#f8fafc;
 }
-.app-header__title { font-weight: 600; }
-.top-strip { height: 40px; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--border); background: #fff; }
+.app-header__title { font-weight:600; }
 
-/* Рабочая область под dock */
+/* Область рабочего стола (под rc-dock) */
 .workbench-area { flex: 1; min-height: 0; position: relative; }
+.workbench-frame { position: absolute; inset: 0; }
 
-/* ВАЖНО: никаких абсолютов на внутренних классах rc-dock!
-   Оставляем лишь «растяжение» контента вкладки. */
-.dock-panel { min-height: 0; }
-.dock-panel .dock-content { display: flex; flex-direction: column; min-height: 0; }
+/* Шапка секции внутри панели */
+.section-title {
+    height: 32px;
+    display:flex; align-items:center;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--border);
+    background:#fff;
+    font-weight: 600;
+}
 
-/* ag-grid контейнеры будут занимать всю доступную высоту за счёт flex в компонентах */
+/* rc-dock: растягиваем контент, не перекрываем таб-бар */
+.dock-panel { display:flex; flex-direction:column; min-height:0; }
+.dock-panel .dock-bar { flex:0 0 auto; }
+.dock-panel .dock-panels { position:relative; flex:1 1 auto; min-height:0; }
+.dock-panel .dock-tabpane { position:absolute; inset:0; display:flex; flex-direction:column; min-height:0; }
+.dock-panel .dock-tabpane .dock-content { flex:1 1 auto; min-height:0; position:relative; }
+
+/* AG Grid: утилиты */
+.ag-theme-alpine.no-header .ag-header { display: none; }

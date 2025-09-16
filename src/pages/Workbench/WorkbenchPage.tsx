@@ -7,11 +7,10 @@ export function WorkbenchPage() {
                 <div className="app-header__title">Записи в журнале</div>
             </header>
 
-            <div className="top-strip">KPI</div>
-            <div className="top-strip">КСГ</div>
-
             <div className="workbench-area">
-                <LayoutManager />
+                <div className="workbench-frame">
+                    <LayoutManager />
+                </div>
             </div>
         </div>
     );

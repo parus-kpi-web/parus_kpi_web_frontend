@@ -1,28 +1,68 @@
 import 'rc-dock/dist/rc-dock.css';
 import DockLayout, { type LayoutBase, type PanelData, type TabData } from 'rc-dock';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { createTab, resolvePanel, defaultTitles, type PanelType, isKnownPanelType } from './PanelManager';
 import { loadJSON, saveJSON } from '../../shared/lib/storage';
-import { createPanelTab, resolvePanel, type PanelType, type PanelParams } from './PanelManager';
 
-const STORAGE_KEY = 'workbench.layout.v1'; // новый ключ — игнорируем старые «битые» сохранения
+const STORAGE_KEY = 'workbench.full.rcdock.v2';
 
-// сопоставление типов вкладок и читаемых заголовков (на случай отсутствия title в сохранённом табе)
-const defaultTitles: Record<PanelType, string> = {
-    'table.services': 'Услуги',
-    'table.employees': 'Сотрудники',
-    'table.stock': 'Склад',
-    'table.cases': 'Госпитализации',
-    'table.finance': 'Финансы',
-};
-
+/** Верх полностью на rc-dock (две группы по два блока), низ — две панели с вкладками */
 const defaultLayout: LayoutBase = {
     dockbox: {
-        mode: 'horizontal',
+        mode: 'vertical',
         children: [
+            { size: 1.4, tabs: [ createTab('group.kpi') ] },
+            { size: 1.2, tabs: [ createTab('group.ksg') ] },
+
+            // Нижняя половина: две панели с вкладками (каждая — вложенный DockLayout)
             {
+                size: 2,
+                panelLock: { panelStyle: 'main' },
                 tabs: [
-                    createPanelTab('table.employees', { title: 'Сотрудники' }),
-                    createPanelTab('table.services', { title: 'Услуги' }),
+                    {
+                        id: 'tabs.upper',
+                        title: 'Пребывание / Карты',
+                        content: (
+                            <DockLayout
+                                defaultLayout={{
+                                    dockbox: {
+                                        mode: 'horizontal',
+                                        children: [
+                                            { tabs: [ createTab('tab.stay') ] },
+                                            { tabs: [ createTab('tab.cards') ] },
+                                        ],
+                                    },
+                                }}
+                                style={{ height: '100%', width: '100%' }}
+                            />
+                        ),
+                        closable: false,
+                    },
+                ],
+            },
+            {
+                size: 2,
+                panelLock: { panelStyle: 'main' },
+                tabs: [
+                    {
+                        id: 'tabs.lower',
+                        title: 'Услуги / Материалы',
+                        content: (
+                            <DockLayout
+                                defaultLayout={{
+                                    dockbox: {
+                                        mode: 'horizontal',
+                                        children: [
+                                            { tabs: [ createTab('tab.services') ] },
+                                            { tabs: [ createTab('tab.materials') ] },
+                                        ],
+                                    },
+                                }}
+                                style={{ height: '100%', width: '100%' }}
+                            />
+                        ),
+                        closable: false,
+                    },
                 ],
             },
         ],
@@ -30,40 +70,28 @@ const defaultLayout: LayoutBase = {
 };
 
 export function LayoutManager() {
-    const layoutRef = useRef<DockLayout>(null);
+    const ref = useRef<DockLayout>(null);
     const [layout, setLayout] = useState<LayoutBase>(() => loadJSON(STORAGE_KEY, defaultLayout));
 
     const onLayoutChange = (l: LayoutBase) => { setLayout(l); saveJSON(STORAGE_KEY, l); };
 
-    // ВАЖНО: при восстановлении таба подставляем и content, и человекочитаемый title
+    /** ВАЖНО: восстанавливаем ТОЛЬКО известные типы. Остальные табы (служебные) возвращаем как есть */
     function loadTab(tab: TabData): TabData {
-        const type: PanelType | undefined =
-            (tab.data as any)?.type ?? (tab.id?.split(':')[0] as PanelType | undefined);
-        const params: PanelParams | undefined = (tab.data as any)?.params;
+        const idPrefix = tab.id?.split(':')[0];
+        const typeFromData = (tab.data as any)?.type as string | undefined;
+        const t: PanelType | undefined =
+            (isKnownPanelType(typeFromData) ? typeFromData : undefined) ??
+            (isKnownPanelType(idPrefix) ? (idPrefix as PanelType) : undefined);
 
-        if (!type) return tab; // ничего не знаем о табе — отдадим как есть
+        if (!t) return tab; // это не наша «контентная» панель (например, tabs.upper) — оставить как есть
 
-        const title = (tab.title as string | undefined) ?? params?.title ?? defaultTitles[type];
-        return {
-            ...tab,
-            title,
-            content: resolvePanel(type, params),
-            data: { type, params },
-            cached: true,
-            closable: tab.closable ?? true,
-        };
+        const title = (tab.title as string | undefined) ?? defaultTitles[t];
+        return { ...tab, title, content: resolvePanel(t), data: { type: t }, cached: true, closable: false };
     }
-
-    useEffect(() => {
-        (window as any).openPanel = (type: PanelType, params?: PanelParams) => {
-            const tab = createPanelTab(type, params);
-            layoutRef.current?.dockMove(tab, null, 'middle');
-        };
-    }, []);
 
     return (
         <DockLayout
-            ref={layoutRef}
+            ref={ref}
             defaultLayout={layout}
             onLayoutChange={onLayoutChange}
             style={{ height: '100%', width: '100%' }}
